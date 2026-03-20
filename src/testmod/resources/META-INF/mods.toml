@@ -1,0 +1,31 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="mothlib_test"
+version="${mod_version}"
+displayName="MothLib Test"
+authors="Denmoth"
+description="Internal testing mod"
+
+[[dependencies.mothlib_test]]
+modId="forge"
+mandatory=true
+versionRange="[47,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.mothlib_test]]
+modId="minecraft"
+mandatory=true
+versionRange="[${minecraft_version},${minecraft_version_range_upper})"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.mothlib_test]]
+modId="mothlib"
+mandatory=true
+versionRange="[${mod_version},)"
+ordering="NONE"
+side="BOTH"
