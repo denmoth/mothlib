@@ -7,6 +7,7 @@ public final class MothLib {
 
     public static void init() {
         MothPlacements.register();
+        com.denmoth.mothlib.registry.MothStructureTypes.register();
     }
 
     private MothLib() {
