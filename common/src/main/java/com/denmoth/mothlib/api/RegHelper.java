@@ -8,9 +8,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 
@@ -23,6 +27,8 @@ public class RegHelper {
     private final IMothDeferredRegister<SoundEvent> sounds;
     private final IMothDeferredRegister<EntityType<?>> entities;
     private final IMothDeferredRegister<StructureType<?>> structureTypes;
+    private final IMothDeferredRegister<BlockEntityType<?>> blockEntities;
+    private final IMothDeferredRegister<MenuType<?>> menus;
 
     public RegHelper(String modId) {
         this.modId = modId;
@@ -31,6 +37,8 @@ public class RegHelper {
         this.sounds = MothServices.REGISTRY.create(modId, Registries.SOUND_EVENT);
         this.entities = MothServices.REGISTRY.create(modId, Registries.ENTITY_TYPE);
         this.structureTypes = MothServices.REGISTRY.create(modId, Registries.STRUCTURE_TYPE);
+        this.blockEntities = MothServices.REGISTRY.create(modId, Registries.BLOCK_ENTITY_TYPE);
+        this.menus = MothServices.REGISTRY.create(modId, Registries.MENU);
     }
 
     /** Call once from mod initialization. */
@@ -40,6 +48,8 @@ public class RegHelper {
         sounds.register();
         entities.register();
         structureTypes.register();
+        blockEntities.register();
+        menus.register();
     }
 
     public <T extends Block> Supplier<T> block(String name, Supplier<T> block) {
@@ -70,5 +80,13 @@ public class RegHelper {
 
     public <S extends Structure> Supplier<StructureType<S>> structureType(String name, Codec<S> codec) {
         return structureTypes.register(name, () -> () -> codec);
+    }
+
+    public <T extends BlockEntity> Supplier<BlockEntityType<T>> blockEntity(String name, Supplier<BlockEntityType<T>> blockEntityType) {
+        return blockEntities.register(name, blockEntityType);
+    }
+
+    public <T extends AbstractContainerMenu> Supplier<MenuType<T>> menu(String name, Supplier<MenuType<T>> menuType) {
+        return menus.register(name, menuType);
     }
 }
