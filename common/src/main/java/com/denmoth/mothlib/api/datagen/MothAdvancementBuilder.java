@@ -11,25 +11,22 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.levelgen.structure.Structure;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 import java.util.function.Consumer;
 
 public class MothAdvancementBuilder {
     private final Consumer<Advancement> saver;
-    private final ExistingFileHelper helper;
     private final String modId;
     private final Advancement.Builder builder = Advancement.Builder.advancement();
     private String name;
 
-    private MothAdvancementBuilder(Consumer<Advancement> saver, ExistingFileHelper helper, String modId) {
+    private MothAdvancementBuilder(Consumer<Advancement> saver, String modId) {
         this.saver = saver;
-        this.helper = helper;
         this.modId = modId;
     }
 
-    public static MothAdvancementBuilder create(Consumer<Advancement> saver, ExistingFileHelper helper, String modId) {
-        return new MothAdvancementBuilder(saver, helper, modId);
+    public static MothAdvancementBuilder create(Consumer<Advancement> saver, String modId) {
+        return new MothAdvancementBuilder(saver, modId);
     }
 
     public MothAdvancementBuilder parent(Advancement parent) {
@@ -76,6 +73,9 @@ public class MothAdvancementBuilder {
     }
 
     public Advancement save() {
-        return builder.save(saver, new ResourceLocation(modId, name), helper);
+        // Fabric doesn't use ExistingFileHelper, and on Forge we can bypass it by passing empty string or null 
+        // to a custom save method, or simply calling builder.save(saver, String) where supported. 
+        // In 1.20.1, builder.save(saver, String) exists.
+        return builder.save(saver, modId + ":" + name);
     }
 }
