@@ -71,4 +71,29 @@ public class MothStructureBuilder {
                 maxDistanceFromCenter
         ));
     }
+
+    public void registerNether(ResourceKey<Structure> key, int scanStartY) {
+        if (startPool == null) throw new IllegalStateException("Start pool is required for " + key.location());
+
+        HolderGetter<Biome> biomeGetter = context.lookup(Registries.BIOME);
+        HolderGetter<StructureTemplatePool> poolGetter = context.lookup(Registries.TEMPLATE_POOL);
+
+        Structure.StructureSettings settings = new Structure.StructureSettings(
+                biomeGetter.getOrThrow(biomes),
+                Map.of(),
+                GenerationStep.Decoration.UNDERGROUND_DECORATION, // Nether structures usually generate underground
+                terrainAdaptation
+        );
+
+        context.register(key, new com.denmoth.mothlib.worldgen.structure.NetherJigsawStructure(
+                settings,
+                poolGetter.getOrThrow(startPool),
+                Optional.empty(),
+                maxDepth,
+                startHeight,
+                Optional.ofNullable(projectStartToHeightmap),
+                maxDistanceFromCenter,
+                scanStartY
+        ));
+    }
 }
