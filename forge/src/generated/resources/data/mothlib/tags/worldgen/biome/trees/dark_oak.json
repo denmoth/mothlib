@@ -1,0 +1,21 @@
+{
+  "values": [
+    "minecraft:dark_forest",
+    {
+      "id": "biomesoplenty:ominous_woods",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:dead_forest",
+      "required": false
+    },
+    {
+      "id": "terralith:ominous_meadow",
+      "required": false
+    },
+    {
+      "id": "regions_unexplored:blackwood_taiga",
+      "required": false
+    }
+  ]
+}

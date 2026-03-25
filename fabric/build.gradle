@@ -1,0 +1,43 @@
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+configurations.configureEach {
+    resolutionStrategy {
+        force("net.fabricmc:fabric-loader:$rootProject.fabric_loader_version")
+    }
+}
+
+dependencies {
+    compileOnly(project(path: ':common', configuration: 'namedElements')) { transitive false }
+
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+}
+
+tasks.named('compileJava', JavaCompile).configure {
+    dependsOn project(':common').tasks.compileJava
+}
+
+tasks.named('classes').configure {
+    dependsOn project(':common').tasks.classes
+    doLast {
+        copy {
+            from project(':common').sourceSets.main.output.classesDirs
+            into layout.buildDirectory.dir('classes/java/main')
+        }
+        copy {
+            from project(':common').sourceSets.main.output.resourcesDir
+            into layout.buildDirectory.dir('resources/main')
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        }
+    }
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') {
+        expand version: project.version
+    }
+}

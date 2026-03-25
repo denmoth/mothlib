@@ -1,21 +1,13 @@
 pluginManagement {
     repositories {
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.architectury.dev/' }
+        maven { url = 'https://maven.minecraftforge.net/' }
         gradlePluginPortal()
-        maven {
-            name = 'MinecraftForge'
-            url = 'https://maven.minecraftforge.net/'
-        }
-        // Вот этого не хватало для Parchment:
-        maven {
-            name = 'ParchmentMC'
-            url = 'https://maven.parchmentmc.org'
-        }
     }
 }
 
-plugins {
-    // Эта штука помогает разрешать версии Java, пусть живет
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.7.0'
-}
-
 rootProject.name = 'mothlib'
+include 'common'
+include 'forge'
+include 'fabric'

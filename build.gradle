@@ -1,171 +1,69 @@
 plugins {
-    id 'eclipse'
-    id 'idea'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'dev.architectury.loom' version '1.7-SNAPSHOT' apply false
+    id 'architectury-plugin' version '3.4-SNAPSHOT'
 }
 
-group = 'com.denmoth'
-version = mod_version
-
-base {
-    archivesName = 'mothlib'
+architectury {
+    minecraft = project.minecraft_version
 }
 
-java {
-    toolchain.languageVersion = JavaLanguageVersion.of(17)
+allprojects {
+    group = rootProject.maven_group
+    version = rootProject.mod_version
 }
 
-// === TESTMOD SETUP ===
-sourceSets {
-    testmod {
-        compileClasspath += sourceSets.main.output
-        runtimeClasspath += sourceSets.main.output
+subprojects {
+    apply plugin: 'dev.architectury.loom'
+    apply plugin: 'architectury-plugin'
+    apply plugin: 'maven-publish'
+
+    base {
+        archivesName = "$rootProject.archives_name-$project.name"
     }
-}
 
-configurations {
-    testmodImplementation.extendsFrom implementation
-    testmodRuntimeOnly.extendsFrom runtimeOnly
-}
+    repositories {
+        mavenCentral()
+        maven { url = 'https://maven.parchmentmc.org' }
+    }
 
-minecraft {
-    mappings channel: 'official', version: minecraft_version
-    // Если используешь parchment, раскомментируй и настрой:
-    // mappings channel: 'parchment', version: '2023.09.03-1.20.1'
+    loom {
+        silentMojangMappingsLicense()
+    }
 
-    runs {
-        client {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
+    dependencies {
+        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+        mappings loom.layered() {
+            officialMojangMappings()
+            parchment("org.parchmentmc.data:parchment-1.20.1:${rootProject.parchment_version}")
+        }
+    }
 
-            mods {
-                mothlib { source sourceSets.main }
-                mothlib_test { source sourceSets.testmod }
+    java {
+        withSourcesJar()
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = 17
+    }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                artifactId = base.archivesName.get()
+                // Let Loom handle the publication if possible, or just add remapJar
+                afterEvaluate {
+                    artifact(tasks.getByName("remapJar")) {
+                        builtBy tasks.getByName("remapJar")
+                    }
+                    artifact(tasks.getByName("remapSourcesJar")) {
+                        builtBy tasks.getByName("remapSourcesJar")
+                        classifier = "sources"
+                    }
+                }
             }
         }
-
-        server {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            mods {
-                mothlib { source sourceSets.main }
-                mothlib_test { source sourceSets.testmod }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            args '--mod', 'mothlib', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-
-            mods {
-                mothlib { source sourceSets.main }
-                mothlib_test { source sourceSets.testmod }
-            }
-        }
     }
-}
-
-sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-repositories {
-    mavenCentral()
-    maven { url = "https://maven.parchmentmc.org" }
-}
-
-dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-
-    // Testmod зависит от основного кода
-    testmodImplementation sourceSets.main.output
-
-    testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
-}
-
-tasks.named('test', Test).configure {
-    useJUnitPlatform()
-}
-
-def resourceTokens = [
-        minecraft_version            : minecraft_version,
-        minecraft_version_range_upper: minecraft_version_range_upper,
-        mod_id                       : mod_id,
-        mod_version                  : mod_version,
-]
-
-tasks.named('processResources', ProcessResources).configure {
-    inputs.properties resourceTokens
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
-        expand resourceTokens + [project: project]
-    }
-}
-
-tasks.named('processTestmodResources', ProcessResources).configure {
-    inputs.properties resourceTokens
-    filesMatching('META-INF/mods.toml') {
-        expand resourceTokens + [project: project]
-    }
-}
-
-// Собираем JAR только из MAIN (без testmod)
-tasks.named('jar', Jar).configure {
-    from sourceSets.main.output
-    manifest {
-        attributes([
-                "Specification-Title": "mothlib",
-                "Specification-Vendor": "denmoth",
-                "Implementation-Title": project.name,
-                "Implementation-Version": project.jar.archiveVersion
-        ])
-    }
-}
-
-task runInPrism(type: Exec) {
-    dependsOn 'jar'
-    group = "execution"
-    description = "Copies the mod to Prism Launcher and launches."
-
-    // 1. Читаем твои глобальные переменные
-    // Если их нет, кидаем null, проверка будет ниже
-    def globalExe = project.findProperty("global_prism_exe")
-    def globalInstances = project.findProperty("global_prism_instances_path")
-    def instanceName = project.findProperty("instance_name") ?: "1.20.1-Dev"
-
-    doFirst {
-        println "=== MothLib Deploy Debug ==="
-        println "EXE: ${globalExe}"
-        println "Instances Path: ${globalInstances}"
-        println "Target Instance: ${instanceName}"
-
-        if (!globalExe || !globalInstances) {
-            throw new GradleException("ОШИБКА: В gradle.properties не найдены 'global_prism_exe' или 'global_prism_instances_path'!")
-        }
-
-        // Собираем путь к папке модов
-        // replace('//', '/') на случай если двойные слеши мешают Java
-        def modsDirStr = "${globalInstances}/${instanceName}/minecraft/mods".toString().replace('//', '/')
-        File modsFolder = new File(modsDirStr)
-
-        if (!modsFolder.exists()) {
-            println "Создаю папку: ${modsFolder.absolutePath}"
-            modsFolder.mkdirs()
-        }
-
-        println "Копирую JAR в: ${modsFolder.absolutePath}"
-        copy {
-            from tasks.jar.archiveFile
-            into modsFolder
-        }
-    }
-
-    // Запуск
-    commandLine globalExe.toString().replace('//', '/'), "--launch", instanceName
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
 }

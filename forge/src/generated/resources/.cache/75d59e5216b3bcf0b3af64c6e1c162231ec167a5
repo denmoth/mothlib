@@ -1,0 +1,24 @@
+// 1.20.1	2026-03-25T15:43:08.867888042	Tags for minecraft:worldgen/biome mod id vanilla
+2afbaf7cfe1e21f8f43f6c2080476e6dd23e4868 data/mothlib/tags/worldgen/biome/climate/cold.json
+67806e58ad741ef4bad6539cc7223d52b5f10589 data/mothlib/tags/worldgen/biome/climate/hot.json
+336e4f8f8cba8d5aab036141902f88421ba00624 data/mothlib/tags/worldgen/biome/climate/temperate.json
+ce1f4b9184f5b6477576f82a21f350df818b96ca data/mothlib/tags/worldgen/biome/soil/grass.json
+4c42ff5aeefd5b8c6df3a396b44500570c263ea3 data/mothlib/tags/worldgen/biome/soil/mud.json
+233d3acc9a5808e351a437ece14ba96c32d796df data/mothlib/tags/worldgen/biome/soil/mushroom.json
+01034f51ff013765bd89614de300ec0ac7acb99f data/mothlib/tags/worldgen/biome/soil/podzol.json
+429cbe40537aee57730b73f5158c9e22987a93d8 data/mothlib/tags/worldgen/biome/soil/sand.json
+a5300e67f18aaefaea770e1639328b5aa41bf0ea data/mothlib/tags/worldgen/biome/soil/snow.json
+3e69452fc5ca11fd6ffeec027ce941314cf6c157 data/mothlib/tags/worldgen/biome/terrain/coastal.json
+74f826114dc36552bfffc34befa2c4b9a6ca8fba data/mothlib/tags/worldgen/biome/terrain/mountain.json
+da2181b84dd5bff52c79456b98d1bb92ef35cc99 data/mothlib/tags/worldgen/biome/terrain/wetland.json
+f7d6655f9dd79c28b0cbdb2492ad59c061d75b12 data/mothlib/tags/worldgen/biome/trees/acacia.json
+a0131c2cf447ea1e488a2dd6d4aeede4b908bedd data/mothlib/tags/worldgen/biome/trees/birch.json
+633b0d2c1b2ecbb1a9676c9fc3de55e3a5da88bc data/mothlib/tags/worldgen/biome/trees/cherry.json
+dcef3355a26f135e871a5bad13da423e31ec3629 data/mothlib/tags/worldgen/biome/trees/dark_oak.json
+9c834a9a8187d8736c225336e5f3172ae8e5d419 data/mothlib/tags/worldgen/biome/trees/jungle.json
+1c7b895bead2e61bff6a8fd3e6a9fd609b2605b1 data/mothlib/tags/worldgen/biome/trees/mangrove.json
+5fa667dfaac7f9f39bdc6058e3c6f24d0b193e67 data/mothlib/tags/worldgen/biome/trees/maple.json
+ea0294ec68cff082a76026c0e825194aca4b6213 data/mothlib/tags/worldgen/biome/trees/oak.json
+e8629b8b32cf0eca08f7dc0cde08c77abe11abed data/mothlib/tags/worldgen/biome/trees/redwood.json
+45f19df4fdb5270288a9e59930ca98d1e55b8974 data/mothlib/tags/worldgen/biome/trees/spruce.json
+01a77a50c0ebd0a2c4f128a348a8e783655a8676 data/mothlib/tags/worldgen/biome/without_structures.json

@@ -1,0 +1,13 @@
+{
+  "values": [
+    "minecraft:mushroom_fields",
+    {
+      "id": "biomesoplenty:fungal_jungle",
+      "required": false
+    },
+    {
+      "id": "terralith:moonlight_grove",
+      "required": false
+    }
+  ]
+}
