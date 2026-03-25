@@ -6,7 +6,10 @@ import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
+import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
+import com.denmoth.mothlib.worldgen.placement.ConfigurableStructurePlacement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +35,21 @@ public class MothStructureSetBuilder {
 
     public MothStructureSetBuilder placement(StructurePlacement placement) {
         this.placement = placement;
+        return this;
+    }
+
+    public MothStructureSetBuilder randomPlacement(int spacing, int separation, int salt) {
+        this.placement = new RandomSpreadStructurePlacement(spacing, separation, RandomSpreadType.LINEAR, salt);
+        return this;
+    }
+
+    public MothStructureSetBuilder randomPlacement(int spacing, int separation, RandomSpreadType spreadType, int salt) {
+        this.placement = new RandomSpreadStructurePlacement(spacing, separation, spreadType, salt);
+        return this;
+    }
+
+    public MothStructureSetBuilder configurablePlacement(int spacing, int separation, int salt, String configId) {
+        this.placement = new ConfigurableStructurePlacement(spacing, separation, RandomSpreadType.LINEAR, salt, configId);
         return this;
     }
 

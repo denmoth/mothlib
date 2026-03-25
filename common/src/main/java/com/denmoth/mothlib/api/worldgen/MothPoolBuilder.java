@@ -47,8 +47,16 @@ public class MothPoolBuilder {
     }
 
     public MothPoolBuilder add(String path, int weight, Holder<StructureProcessorList> processors) {
+        return add(new ResourceLocation(modId, path), weight, processors);
+    }
+
+    public MothPoolBuilder add(ResourceLocation location, int weight) {
+        return add(location, weight, getEmptyProcessors());
+    }
+
+    public MothPoolBuilder add(ResourceLocation location, int weight, Holder<StructureProcessorList> processors) {
         Function<StructureTemplatePool.Projection, ? extends StructurePoolElement> element =
-                StructurePoolElement.single(new ResourceLocation(modId, path).toString(), processors);
+                StructurePoolElement.single(location.toString(), processors);
         elements.add(Pair.of(element, weight));
         return this;
     }

@@ -33,6 +33,10 @@ public class ConfigurableStructurePlacement extends RandomSpreadStructurePlaceme
         this.configId = configId;
     }
 
+    public ConfigurableStructurePlacement(int spacing, int separation, RandomSpreadType type, int salt, String configId) {
+        this(Vec3i.ZERO, StructurePlacement.FrequencyReductionMethod.DEFAULT, 1.0F, salt, Optional.empty(), spacing, separation, type, configId);
+    }
+
     private MothConfigRegistry.ConfigEntry getEntry() {
         if (cachedEntry == null && !configId.isEmpty()) {
             cachedEntry = MothConfigRegistry.get(configId);
