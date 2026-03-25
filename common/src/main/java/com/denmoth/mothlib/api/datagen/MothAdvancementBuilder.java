@@ -67,6 +67,37 @@ public class MothAdvancementBuilder {
         return this;
     }
 
+    public MothAdvancementBuilder hasItem(ItemLike item) {
+        builder.addCriterion("has_" + BuiltInRegistries.ITEM.getKey(item.asItem()).getPath(),
+                InventoryChangeTrigger.TriggerInstance.hasItems(item));
+        return this;
+    }
+
+    public MothAdvancementBuilder inBiome(ResourceKey<net.minecraft.world.level.biome.Biome> biome) {
+        builder.addCriterion("in_" + biome.location().getPath(),
+                PlayerTrigger.TriggerInstance.located(LocationPredicate.inBiome(biome)));
+        return this;
+    }
+
+    public MothAdvancementBuilder interactedWith(net.minecraft.world.level.block.Block block) {
+        builder.addCriterion("interacted_with_" + BuiltInRegistries.BLOCK.getKey(block).getPath(),
+                ItemUsedOnLocationTrigger.TriggerInstance.itemUsedOnBlock(
+                        LocationPredicate.Builder.location().setBlock(
+                                net.minecraft.advancements.critereon.BlockPredicate.Builder.block().of(block).build()),
+                        ItemPredicate.Builder.item()));
+        return this;
+    }
+
+    public MothAdvancementBuilder rewardExp(int exp) {
+        builder.rewards(net.minecraft.advancements.AdvancementRewards.Builder.experience(exp));
+        return this;
+    }
+
+    public MothAdvancementBuilder rewardLoot(ResourceLocation lootTable) {
+        builder.rewards(net.minecraft.advancements.AdvancementRewards.Builder.loot(lootTable));
+        return this;
+    }
+
     public MothAdvancementBuilder or() {
         builder.requirements(RequirementsStrategy.OR);
         return this;
