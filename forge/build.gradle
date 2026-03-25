@@ -1,0 +1,144 @@
+plugins {
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'src/generated/resources'
+        }
+    }
+    testmod {
+        compileClasspath += sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.runtimeClasspath
+    }
+}
+
+loom {
+    forge {
+        dataGen {
+            mod project.mod_id
+        }
+    }
+    runs {
+        client {
+            mods {
+                mothlib {
+                    sourceSet sourceSets.main
+                }
+                mothlib_test {
+                    sourceSet sourceSets.testmod
+                }
+            }
+        }
+        server {
+            mods {
+                mothlib {
+                    sourceSet sourceSets.main
+                }
+                mothlib_test {
+                    sourceSet sourceSets.testmod
+                }
+            }
+        }
+    }
+}
+
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
+dependencies {
+    compileOnly(project(path: ':common', configuration: 'namedElements')) { transitive false }
+
+    forge "net.minecraftforge:forge:${rootProject.forge_version}"
+    modImplementation "dev.architectury:architectury-forge:${rootProject.architectury_version}"
+}
+
+tasks.named('compileJava', JavaCompile).configure {
+    dependsOn project(':common').tasks.compileJava
+}
+
+tasks.named('classes').configure {
+    dependsOn project(':common').tasks.classes
+    doLast {
+        copy {
+            from project(':common').sourceSets.main.output.classesDirs
+            into layout.buildDirectory.dir('classes/java/main')
+        }
+        copy {
+            from project(':common').sourceSets.main.output.resourcesDir
+            into layout.buildDirectory.dir('resources/main')
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        }
+    }
+}
+
+configurations {
+    testmodImplementation.extendsFrom implementation
+    testmodRuntimeOnly.extendsFrom runtimeOnly
+}
+
+dependencies {
+    testmodImplementation sourceSets.main.output
+}
+
+def resourceTokens = [
+        minecraft_version            : rootProject.minecraft_version,
+        minecraft_version_range_upper: rootProject.minecraft_version_range_upper,
+        mod_id                       : rootProject.mod_id,
+        mod_version                  : rootProject.mod_version,
+]
+
+tasks.named('processResources', ProcessResources).configure {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    inputs.properties resourceTokens
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand resourceTokens + [project: project]
+    }
+}
+
+tasks.named('processTestmodResources', ProcessResources).configure {
+    inputs.properties resourceTokens
+    filesMatching('META-INF/mods.toml') {
+        expand resourceTokens + [project: project]
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                "Specification-Title"     : "mothlib",
+                "Specification-Vendor"    : "denmoth",
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.jar.archiveVersion,
+        ])
+    }
+}
+
+task runInPrism(type: Exec) {
+    dependsOn 'remapJar'
+    group = 'execution'
+    description = 'Copies the Forge JAR to Prism Launcher and launches.'
+
+    def globalExe = project.findProperty('global_prism_exe')
+    def globalInstances = project.findProperty('global_prism_instances_path')
+    def instanceName = project.findProperty('instance_name') ?: rootProject.instance_name
+
+    doFirst {
+        if (!globalExe || !globalInstances) {
+            throw new GradleException("Set 'global_prism_exe' and 'global_prism_instances_path' in gradle.properties")
+        }
+        def modsDirStr = "${globalInstances}/${instanceName}/minecraft/mods".toString().replace('//', '/')
+        File modsFolder = new File(modsDirStr)
+        if (!modsFolder.exists()) {
+            modsFolder.mkdirs()
+        }
+        copy {
+            from tasks.remapJar.archiveFile
+            into modsFolder
+        }
+    }
+
+    commandLine globalExe.toString().replace('//', '/'), '--launch', instanceName
+}
