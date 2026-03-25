@@ -1,8 +1,8 @@
 package com.denmoth.mothlib.api;
 
 import com.mojang.serialization.Codec;
-import dev.architectury.registry.registries.DeferredRegister;
-import dev.architectury.registry.registries.RegistrySupplier;
+import com.denmoth.mothlib.platform.MothServices;
+import com.denmoth.mothlib.platform.services.IMothDeferredRegister;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -18,22 +18,22 @@ import java.util.function.Supplier;
 
 public class RegHelper {
     private final String modId;
-    private final DeferredRegister<Block> blocks;
-    private final DeferredRegister<Item> items;
-    private final DeferredRegister<SoundEvent> sounds;
-    private final DeferredRegister<EntityType<?>> entities;
-    private final DeferredRegister<StructureType<?>> structureTypes;
+    private final IMothDeferredRegister<Block> blocks;
+    private final IMothDeferredRegister<Item> items;
+    private final IMothDeferredRegister<SoundEvent> sounds;
+    private final IMothDeferredRegister<EntityType<?>> entities;
+    private final IMothDeferredRegister<StructureType<?>> structureTypes;
 
     public RegHelper(String modId) {
         this.modId = modId;
-        this.blocks = DeferredRegister.create(modId, Registries.BLOCK);
-        this.items = DeferredRegister.create(modId, Registries.ITEM);
-        this.sounds = DeferredRegister.create(modId, Registries.SOUND_EVENT);
-        this.entities = DeferredRegister.create(modId, Registries.ENTITY_TYPE);
-        this.structureTypes = DeferredRegister.create(modId, Registries.STRUCTURE_TYPE);
+        this.blocks = MothServices.REGISTRY.create(modId, Registries.BLOCK);
+        this.items = MothServices.REGISTRY.create(modId, Registries.ITEM);
+        this.sounds = MothServices.REGISTRY.create(modId, Registries.SOUND_EVENT);
+        this.entities = MothServices.REGISTRY.create(modId, Registries.ENTITY_TYPE);
+        this.structureTypes = MothServices.REGISTRY.create(modId, Registries.STRUCTURE_TYPE);
     }
 
-    /** Call once from mod initialization (Architectury registers all deferred entries). */
+    /** Call once from mod initialization. */
     public void register() {
         blocks.register();
         items.register();
@@ -42,33 +42,33 @@ public class RegHelper {
         structureTypes.register();
     }
 
-    public <T extends Block> RegistrySupplier<T> block(String name, Supplier<T> block) {
+    public <T extends Block> Supplier<T> block(String name, Supplier<T> block) {
         return block(name, block, new Item.Properties());
     }
 
-    public <T extends Block> RegistrySupplier<T> block(String name, Supplier<T> block, Item.Properties props) {
-        RegistrySupplier<T> ret = blocks.register(name, block);
+    public <T extends Block> Supplier<T> block(String name, Supplier<T> block, Item.Properties props) {
+        Supplier<T> ret = blocks.register(name, block);
         items.register(name, () -> new BlockItem(ret.get(), props));
         return ret;
     }
 
-    public <T extends Item> RegistrySupplier<T> item(String name, Supplier<T> item) {
+    public <T extends Item> Supplier<T> item(String name, Supplier<T> item) {
         return items.register(name, item);
     }
 
-    public RegistrySupplier<Item> simpleItem(String name) {
+    public Supplier<Item> simpleItem(String name) {
         return item(name, () -> new Item(new Item.Properties()));
     }
 
-    public RegistrySupplier<SoundEvent> sound(String name) {
+    public Supplier<SoundEvent> sound(String name) {
         return sounds.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(modId, name)));
     }
 
-    public <T extends Entity> RegistrySupplier<EntityType<T>> entity(String name, EntityType.Builder<T> builder) {
+    public <T extends Entity> Supplier<EntityType<T>> entity(String name, EntityType.Builder<T> builder) {
         return entities.register(name, () -> builder.build(name));
     }
 
-    public <S extends Structure> RegistrySupplier<StructureType<S>> structureType(String name, Codec<S> codec) {
+    public <S extends Structure> Supplier<StructureType<S>> structureType(String name, Codec<S> codec) {
         return structureTypes.register(name, () -> () -> codec);
     }
 }

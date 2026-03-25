@@ -52,7 +52,10 @@ dependencies {
     compileOnly(project(path: ':common', configuration: 'namedElements')) { transitive false }
 
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
-    modImplementation "dev.architectury:architectury-forge:${rootProject.architectury_version}"
+}
+
+tasks.named('sourcesJar', Jar).configure {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 tasks.named('compileJava', JavaCompile).configure {

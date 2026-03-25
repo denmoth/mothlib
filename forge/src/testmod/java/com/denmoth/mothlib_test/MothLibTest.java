@@ -2,7 +2,6 @@ package com.denmoth.mothlib_test;
 
 import com.denmoth.mothlib.api.RegHelper;
 import com.denmoth.mothlib_test.datagen.TestDatagen;
-import dev.architectury.platform.forge.EventBuses;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraftforge.common.MinecraftForge;
@@ -19,7 +18,6 @@ public class MothLibTest {
 
     public MothLibTest() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        EventBuses.registerModEventBus(MODID, modBus);
 
         // 1. Регистрируем предметы для теста
         // Блок, который будет генерироваться в структуре

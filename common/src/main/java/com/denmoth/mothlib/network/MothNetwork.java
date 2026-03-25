@@ -1,6 +1,7 @@
 package com.denmoth.mothlib.network;
 
-import dev.architectury.networking.NetworkManager;
+import com.denmoth.mothlib.platform.MothServices;
+import com.denmoth.mothlib.platform.services.INetworkHelper;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -9,7 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.function.Function;
 
 /**
- * Thin wrapper around Architectury {@link NetworkManager}. Each packet uses its own {@link ResourceLocation} id
+ * Thin wrapper around Network implementation. Each packet uses its own {@link ResourceLocation} id
  * ({@code modId/packetName}).
  */
 public class MothNetwork {
@@ -32,24 +33,16 @@ public class MothNetwork {
         return new ResourceLocation(modId, packetName);
     }
 
-    public <MSG extends IMothPacket> void register(NetworkManager.Side side, String packetName, Function<FriendlyByteBuf, MSG> decoder) {
-        ResourceLocation pid = id(packetName);
-        NetworkManager.registerReceiver(side, pid, (buf, ctx) -> {
-            MSG msg = decoder.apply(buf);
-            ctx.queue(() -> msg.handle(ctx));
-        });
+    public <MSG extends IMothPacket> void register(INetworkHelper.Side side, String packetName, Function<FriendlyByteBuf, MSG> decoder) {
+        MothServices.NETWORK.registerReceiver(side, id(packetName), decoder);
     }
 
     public void sendToServer(String packetName, IMothPacket msg) {
-        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-        msg.encode(buf);
-        NetworkManager.sendToServer(id(packetName), buf);
+        MothServices.NETWORK.sendToServer(id(packetName), msg);
     }
 
     public void sendToPlayer(String packetName, IMothPacket msg, ServerPlayer player) {
-        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-        msg.encode(buf);
-        NetworkManager.sendToPlayer(player, id(packetName), buf);
+        MothServices.NETWORK.sendToPlayer(player, id(packetName), msg);
     }
 
     public void sendToPlayers(String packetName, IMothPacket msg, Iterable<ServerPlayer> players) {

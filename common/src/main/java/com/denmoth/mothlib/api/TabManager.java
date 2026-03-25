@@ -1,7 +1,7 @@
 package com.denmoth.mothlib.api;
 
-import dev.architectury.registry.registries.DeferredRegister;
-import dev.architectury.registry.registries.RegistrySupplier;
+import com.denmoth.mothlib.platform.MothServices;
+import com.denmoth.mothlib.platform.services.IMothDeferredRegister;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class TabManager {
-    private final DeferredRegister<CreativeModeTab> tabs;
+    private final IMothDeferredRegister<CreativeModeTab> tabs;
 
     public TabManager(String modId) {
-        this.tabs = DeferredRegister.create(modId, Registries.CREATIVE_MODE_TAB);
+        this.tabs = MothServices.REGISTRY.create(modId, Registries.CREATIVE_MODE_TAB);
     }
 
     public void register() {
@@ -39,17 +39,17 @@ public class TabManager {
             this.icon = icon;
         }
 
-        public <T extends ItemLike> RegistrySupplier<T> add(RegistrySupplier<T> item) {
+        public <T extends ItemLike> Supplier<T> add(Supplier<T> item) {
             items.add(item);
             return item;
         }
 
         private CreativeModeTab build() {
             return CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
-                    .title(Component.translatable("itemGroup." + id))
-                    .icon(icon)
-                    .displayItems((params, output) -> items.forEach(s -> output.accept(s.get())))
-                    .build();
+                .title(Component.translatable("itemGroup." + id))
+                .icon(icon)
+                .displayItems((params, output) -> items.forEach(s -> output.accept(s.get())))
+                .build();
         }
     }
 }

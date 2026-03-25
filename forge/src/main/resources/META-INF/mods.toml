@@ -23,10 +23,3 @@ mandatory=true
 versionRange="[${minecraft_version},${minecraft_version_range_upper})"
 ordering="NONE"
 side="BOTH"
-
-[[dependencies.mothlib]]
-modId="architectury"
-mandatory=true
-versionRange="[9.2.14,)"
-ordering="AFTER"
-side="BOTH"

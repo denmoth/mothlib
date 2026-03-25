@@ -3,7 +3,6 @@ package com.denmoth.mothlib.forge;
 import com.denmoth.mothlib.MothLib;
 import com.denmoth.mothlib.config.MothConfig;
 import com.denmoth.mothlib.datagen.MothDataGen;
-import dev.architectury.platform.forge.EventBuses;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -17,7 +16,6 @@ public class MothLibForge {
 
     public MothLibForge() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        EventBuses.registerModEventBus(MothLib.MODID, modBus);
         modBus.addListener(MothLibForge::onGatherData);
 
         MothLib.init();
