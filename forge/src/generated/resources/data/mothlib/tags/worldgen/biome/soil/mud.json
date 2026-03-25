@@ -1,0 +1,22 @@
+{
+  "values": [
+    "minecraft:mangrove_swamp",
+    "minecraft:swamp",
+    {
+      "id": "biomesoplenty:marsh",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:wetland",
+      "required": false
+    },
+    {
+      "id": "biomeswevegone:cypress_swamplands",
+      "required": false
+    },
+    {
+      "id": "regions_unexplored:bayou",
+      "required": false
+    }
+  ]
+}

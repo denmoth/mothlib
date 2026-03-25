@@ -1,0 +1,16 @@
+{
+  "values": [
+    "minecraft:plains",
+    "minecraft:forest",
+    "minecraft:river",
+    "minecraft:ocean",
+    {
+      "id": "terralith:temperate_highlands",
+      "required": false
+    },
+    {
+      "id": "regions_unexplored:prairie",
+      "required": false
+    }
+  ]
+}

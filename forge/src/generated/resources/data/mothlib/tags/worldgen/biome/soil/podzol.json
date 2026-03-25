@@ -1,0 +1,16 @@
+{
+  "values": [
+    "minecraft:taiga",
+    "minecraft:old_growth_pine_taiga",
+    "minecraft:old_growth_spruce_taiga",
+    "minecraft:grove",
+    {
+      "id": "biomesoplenty:coniferous_forest",
+      "required": false
+    },
+    {
+      "id": "terralith:cloud_forest",
+      "required": false
+    }
+  ]
+}

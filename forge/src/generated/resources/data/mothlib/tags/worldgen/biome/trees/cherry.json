@@ -1,0 +1,17 @@
+{
+  "values": [
+    "minecraft:cherry_grove",
+    {
+      "id": "terralith:sakura_grove",
+      "required": false
+    },
+    {
+      "id": "biomeswevegone:cherry_blossom_grove",
+      "required": false
+    },
+    {
+      "id": "regions_unexplored:alpha_grove",
+      "required": false
+    }
+  ]
+}

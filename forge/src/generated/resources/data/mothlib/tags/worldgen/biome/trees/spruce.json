@@ -1,0 +1,49 @@
+{
+  "values": [
+    "minecraft:taiga",
+    "minecraft:old_growth_pine_taiga",
+    "minecraft:old_growth_spruce_taiga",
+    "minecraft:snowy_taiga",
+    "minecraft:grove",
+    {
+      "id": "biomesoplenty:coniferous_forest",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:fir_clearing",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:snowy_fir_clearing",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:snowy_coniferous_forest",
+      "required": false
+    },
+    {
+      "id": "terralith:winter_taiga",
+      "required": false
+    },
+    {
+      "id": "terralith:cold_shrubland",
+      "required": false
+    },
+    {
+      "id": "terralith:alpine_grove",
+      "required": false
+    },
+    {
+      "id": "biomeswevegone:coniferous_forest",
+      "required": false
+    },
+    {
+      "id": "regions_unexplored:blackwood_taiga",
+      "required": false
+    },
+    {
+      "id": "regions_unexplored:cold_boreal_taiga",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "values": [
+    {
+      "id": "biomesoplenty:redwood_forest",
+      "required": false
+    },
+    {
+      "id": "biomeswevegone:redwood_thicket",
+      "required": false
+    },
+    {
+      "id": "terralith:red_oasis",
+      "required": false
+    }
+  ]
+}
