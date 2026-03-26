@@ -81,6 +81,23 @@ public class MothProcessorBuilder {
     }
 
     /**
+     * Позволяет добавить любое кастомное правило, используя ванильные RuleTest
+     * (например, PosRuleTest, RandomBlockStateMatchTest).
+     */
+    public MothProcessorBuilder addRule(RuleTest inputPredicate, RuleTest locationPredicate, BlockState outputState) {
+        currentRules.add(new ProcessorRule(inputPredicate, locationPredicate, outputState));
+        return this;
+    }
+
+    /**
+     * Добавляет готовое ванильное правило.
+     */
+    public MothProcessorBuilder addRule(ProcessorRule rule) {
+        currentRules.add(rule);
+        return this;
+    }
+
+    /**
      * Завершает текущий набор правил и создает из них RuleProcessor.
      * Нужно вызывать перед добавлением других типов процессоров (если они будут).
      * Но для простоты register() сам вызовет это.

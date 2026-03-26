@@ -63,6 +63,33 @@ public class MothLootBuilder {
         }
 
         /**
+         * Adds an item with specified quality (for luck/fortune).
+         */
+        public PoolBuilder add(Item item, int weight, int min, int max, int quality) {
+            builder.add(LootItem.lootTableItem(item)
+                    .setWeight(weight)
+                    .setQuality(quality)
+                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(min, max))));
+            return this;
+        }
+
+        /**
+         * Adds any generic LootPoolEntry (giving full vanilla flexibility).
+         */
+        public PoolBuilder add(net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer.Builder<?> entryBuilder) {
+            builder.add(entryBuilder);
+            return this;
+        }
+
+        /**
+         * Applies a LootItemFunction to the entire pool.
+         */
+        public PoolBuilder apply(net.minecraft.world.level.storage.loot.functions.LootItemFunction.Builder functionBuilder) {
+            builder.apply(functionBuilder);
+            return this;
+        }
+
+        /**
          * Adds an item with a custom NBT tag.
          */
         public PoolBuilder addWithNbt(Item item, int weight, int min, int max, CompoundTag tag) {
