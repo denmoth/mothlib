@@ -6,14 +6,6 @@
       "required": false
     },
     {
-      "id": "biomesoplenty:dead_forest",
-      "required": false
-    },
-    {
-      "id": "terralith:ominous_meadow",
-      "required": false
-    },
-    {
       "id": "regions_unexplored:blackwood_taiga",
       "required": false
     }

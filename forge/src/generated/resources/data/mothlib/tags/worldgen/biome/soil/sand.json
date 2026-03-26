@@ -1,25 +1,16 @@
 {
   "values": [
-    "minecraft:desert",
-    "minecraft:beach",
     {
-      "id": "biomesoplenty:lush_desert",
+      "id": "#minecraft:is_badlands",
       "required": false
     },
+    "minecraft:desert",
     {
-      "id": "terralith:ancient_sands",
+      "id": "biomesoplenty:wasteland",
       "required": false
     },
     {
       "id": "terralith:desert_oasis",
-      "required": false
-    },
-    {
-      "id": "biomeswevegone:sierra_badlands",
-      "required": false
-    },
-    {
-      "id": "regions_unexplored:chalk_cliffs",
       "required": false
     }
   ]

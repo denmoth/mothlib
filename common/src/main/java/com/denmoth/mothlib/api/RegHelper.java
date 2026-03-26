@@ -17,6 +17,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 
 import java.util.function.Supplier;
 
@@ -27,6 +29,7 @@ public class RegHelper {
     private final IMothDeferredRegister<SoundEvent> sounds;
     private final IMothDeferredRegister<EntityType<?>> entities;
     private final IMothDeferredRegister<StructureType<?>> structureTypes;
+    private final IMothDeferredRegister<StructureProcessorType<?>> structureProcessorTypes;
     private final IMothDeferredRegister<BlockEntityType<?>> blockEntities;
     private final IMothDeferredRegister<MenuType<?>> menus;
 
@@ -37,6 +40,7 @@ public class RegHelper {
         this.sounds = MothServices.REGISTRY.create(modId, Registries.SOUND_EVENT);
         this.entities = MothServices.REGISTRY.create(modId, Registries.ENTITY_TYPE);
         this.structureTypes = MothServices.REGISTRY.create(modId, Registries.STRUCTURE_TYPE);
+        this.structureProcessorTypes = MothServices.REGISTRY.create(modId, Registries.STRUCTURE_PROCESSOR);
         this.blockEntities = MothServices.REGISTRY.create(modId, Registries.BLOCK_ENTITY_TYPE);
         this.menus = MothServices.REGISTRY.create(modId, Registries.MENU);
     }
@@ -48,6 +52,7 @@ public class RegHelper {
         sounds.register();
         entities.register();
         structureTypes.register();
+        structureProcessorTypes.register();
         blockEntities.register();
         menus.register();
     }
@@ -80,6 +85,10 @@ public class RegHelper {
 
     public <S extends Structure> Supplier<StructureType<S>> structureType(String name, Codec<S> codec) {
         return structureTypes.register(name, () -> () -> codec);
+    }
+
+    public <P extends StructureProcessor> Supplier<StructureProcessorType<P>> structureProcessorType(String name, Codec<P> codec) {
+        return structureProcessorTypes.register(name, () -> () -> codec);
     }
 
     public <T extends BlockEntity> Supplier<BlockEntityType<T>> blockEntity(String name, Supplier<BlockEntityType<T>> blockEntityType) {

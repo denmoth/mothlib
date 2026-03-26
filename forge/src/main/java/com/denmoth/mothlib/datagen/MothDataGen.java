@@ -17,5 +17,8 @@ public class MothDataGen {
 
         generator.addProvider(event.includeServer(), new MothWorldGenProvider(packOutput, lookupProvider));
         generator.addProvider(event.includeServer(), new MothBiomeTagsProvider(packOutput, lookupProvider));
+        
+        generator.addProvider(event.includeClient(), new MothBlockStateProvider(packOutput, event.getExistingFileHelper()));
+        generator.addProvider(event.includeClient(), new MothLanguageProvider(packOutput));
     }
 }

@@ -2,16 +2,13 @@
   "values": [
     "minecraft:forest",
     "minecraft:flower_forest",
-    "minecraft:swamp",
     "minecraft:plains",
-    "minecraft:windswept_forest",
-    "minecraft:river",
     {
-      "id": "biomesoplenty:seasonal_forest",
+      "id": "#forge:is_deciduous",
       "required": false
     },
     {
-      "id": "biomesoplenty:woodland",
+      "id": "#c:tree_deciduous",
       "required": false
     },
     {
@@ -19,43 +16,11 @@
       "required": false
     },
     {
-      "id": "biomesoplenty:grassland",
-      "required": false
-    },
-    {
-      "id": "biomesoplenty:field",
-      "required": false
-    },
-    {
-      "id": "terralith:temperate_highlands",
-      "required": false
-    },
-    {
-      "id": "terralith:forested_highlands",
+      "id": "biomesoplenty:woodland",
       "required": false
     },
     {
       "id": "terralith:moonlight_grove",
-      "required": false
-    },
-    {
-      "id": "terralith:shield_clearing",
-      "required": false
-    },
-    {
-      "id": "biomeswevegone:aspen_borealis",
-      "required": false
-    },
-    {
-      "id": "biomeswevegone:amaranth_grassland",
-      "required": false
-    },
-    {
-      "id": "regions_unexplored:clover_patch",
-      "required": false
-    },
-    {
-      "id": "regions_unexplored:prairie",
       "required": false
     }
   ]

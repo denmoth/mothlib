@@ -1,20 +1,18 @@
 {
   "values": [
     "minecraft:plains",
-    "minecraft:forest",
-    "minecraft:flower_forest",
-    "minecraft:meadow",
     "minecraft:sunflower_plains",
-    {
-      "id": "biomesoplenty:grassland",
-      "required": false
-    },
+    "minecraft:meadow",
     {
       "id": "terralith:blooming_valley",
       "required": false
     },
     {
-      "id": "regions_unexplored:clover_patch",
+      "id": "biomesoplenty:pasture",
+      "required": false
+    },
+    {
+      "id": "regions_unexplored:prairie",
       "required": false
     }
   ]

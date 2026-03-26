@@ -18,7 +18,15 @@ public class MothWorldGenProvider extends DatapackBuiltinEntriesProvider {
 
     // Сюда мы будем добавлять билдеры. Сейчас он пустой, но
     // в твоих модах ты будешь добавлять сюда .add(Registries.STRUCTURE, ...)
-    public static final RegistrySetBuilder BUILDER = new RegistrySetBuilder();
+    public static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
+            .add(Registries.PROCESSOR_LIST, context -> {
+                context.register(
+                        net.minecraft.resources.ResourceKey.create(Registries.PROCESSOR_LIST, new net.minecraft.resources.ResourceLocation(MothLib.MODID, "terrain_match")),
+                        new net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList(
+                                java.util.List.of(com.denmoth.mothlib.worldgen.processor.MothTerrainMatchProcessor.INSTANCE)
+                        )
+                );
+            });
 
     public MothWorldGenProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries, BUILDER, Set.of(MothLib.MODID));

@@ -4,14 +4,6 @@
     {
       "id": "biomeswevegone:white_mangrove_marshes",
       "required": false
-    },
-    {
-      "id": "biomeswevegone:cypress_swamplands",
-      "required": false
-    },
-    {
-      "id": "regions_unexplored:bayou",
-      "required": false
     }
   ]
 }
