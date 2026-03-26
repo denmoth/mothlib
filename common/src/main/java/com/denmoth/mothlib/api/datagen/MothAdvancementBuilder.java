@@ -19,6 +19,7 @@ public class MothAdvancementBuilder {
     private final String modId;
     private final Advancement.Builder builder = Advancement.Builder.advancement();
     private String name;
+    private ResourceLocation background;
 
     private MothAdvancementBuilder(Consumer<Advancement> saver, String modId) {
         this.saver = saver;
@@ -34,12 +35,22 @@ public class MothAdvancementBuilder {
         return this;
     }
 
+    public MothAdvancementBuilder parent(ResourceLocation parentId) {
+        builder.parent(parentId);
+        return this;
+    }
+
+    public MothAdvancementBuilder background(ResourceLocation background) {
+        this.background = background;
+        return this;
+    }
+
     public MothAdvancementBuilder display(ItemLike icon, String name, FrameType frame, boolean toast, boolean announce, boolean hidden) {
         this.name = name;
         builder.display(icon,
                 Component.translatable("advancements." + modId + "." + name + ".title"),
                 Component.translatable("advancements." + modId + "." + name + ".desc"),
-                null, frame, toast, announce, hidden);
+                this.background, frame, toast, announce, hidden);
         return this;
     }
 
@@ -95,6 +106,23 @@ public class MothAdvancementBuilder {
 
     public MothAdvancementBuilder rewardLoot(ResourceLocation lootTable) {
         builder.rewards(net.minecraft.advancements.AdvancementRewards.Builder.loot(lootTable));
+        return this;
+    }
+
+    public MothAdvancementBuilder completed(ResourceLocation advancementId) {
+        builder.addCriterion("done_" + advancementId.getPath(),
+                PlayerTrigger.TriggerInstance.located(
+                        EntityPredicate.Builder.entity()
+                                .subPredicate(
+                                        PlayerPredicate.Builder.player()
+                                                .checkAdvancementDone(advancementId, true)
+                                                .build())
+                                .build()));
+        return this;
+    }
+
+    public MothAdvancementBuilder tick() {
+        builder.addCriterion("tick", PlayerTrigger.TriggerInstance.located(LocationPredicate.Builder.location().build()));
         return this;
     }
 
