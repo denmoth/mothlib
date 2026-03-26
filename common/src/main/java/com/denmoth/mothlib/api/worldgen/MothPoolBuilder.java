@@ -46,6 +46,14 @@ public class MothPoolBuilder {
         return add(path, weight, getEmptyProcessors());
     }
 
+    public MothPoolBuilder add(String path, int weight, ResourceKey<StructureProcessorList> processorKey) {
+        return add(new ResourceLocation(modId, path), weight, context.lookup(Registries.PROCESSOR_LIST).getOrThrow(processorKey));
+    }
+
+    public MothPoolBuilder add(ResourceLocation location, int weight, ResourceKey<StructureProcessorList> processorKey) {
+        return add(location, weight, context.lookup(Registries.PROCESSOR_LIST).getOrThrow(processorKey));
+    }
+
     public MothPoolBuilder add(String path, int weight, Holder<StructureProcessorList> processors) {
         return add(new ResourceLocation(modId, path), weight, processors);
     }

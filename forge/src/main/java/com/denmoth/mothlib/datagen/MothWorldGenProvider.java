@@ -10,6 +10,8 @@ import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import com.denmoth.mothlib.registry.MothProcessorLists;
+
 /**
  * Этот провайдер генерирует JSON файлы для ConfiguredFeatures, Placements и BiomeModifiers.
  * Мы используем его, чтобы зарегистрировать наши "динамические" объекты.
@@ -21,7 +23,7 @@ public class MothWorldGenProvider extends DatapackBuiltinEntriesProvider {
     public static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
             .add(Registries.PROCESSOR_LIST, context -> {
                 context.register(
-                        net.minecraft.resources.ResourceKey.create(Registries.PROCESSOR_LIST, new net.minecraft.resources.ResourceLocation(MothLib.MODID, "terrain_match")),
+                        MothProcessorLists.TERRAIN_MATCH,
                         new net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList(
                                 java.util.List.of(com.denmoth.mothlib.worldgen.processor.MothTerrainMatchProcessor.INSTANCE)
                         )
