@@ -12,12 +12,12 @@ public class TestAdvancements {
     public static void generate(Consumer<Advancement> saver, ExistingFileHelper existingFileHelper) {
 
         // Корневая ачивка
-        Advancement root = MothAdvancementBuilder.create(saver, existingFileHelper, MothLibTest.MODID)
+        Advancement root = MothAdvancementBuilder.create(saver, MothLibTest.MODID)
                 .task(Items.DIAMOND_PICKAXE, "root") // Иконка и ID
                 .save();
 
         // Ачивка за нахождение структуры
-        MothAdvancementBuilder.create(saver, existingFileHelper, MothLibTest.MODID)
+        MothAdvancementBuilder.create(saver, MothLibTest.MODID)
                 .parent(root)
                 .goal(Items.COMPASS, "find_structure")
                 .inStructure(TestWorldGen.STRUCT_MAIN) // Ссылка на ключ структуры

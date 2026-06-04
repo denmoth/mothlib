@@ -20,11 +20,9 @@ public class MothBlockStateProvider extends BlockStateProvider {
     protected void registerStatesAndModels() {
         // Ground Marker - Dirt sides, green top
         Block groundMarker = MothBlocks.GROUND_MARKER.get();
-        ModelFile groundModel = models().cubeBottomTop(
+        ModelFile groundModel = models().cubeAll(
                 "block/ground_marker",
-                new ResourceLocation("minecraft", "block/dirt"), // Sides
-                new ResourceLocation("minecraft", "block/dirt"), // Bottom
-                new ResourceLocation("minecraft", "block/lime_concrete") // Top
+                new ResourceLocation(MothLib.MODID, "block/ground_marker")
         );
         simpleBlock(groundMarker, groundModel);
         simpleBlockItem(groundMarker, groundModel);
@@ -39,5 +37,14 @@ public class MothBlockStateProvider extends BlockStateProvider {
             simpleBlock(coloredMarker, coloredModel);
             simpleBlockItem(coloredMarker, coloredModel);
         }
+
+        // Tree Marker - Log axis block with custom texture
+        Block treeMarker = MothBlocks.TREE_MARKER.get();
+        ModelFile treeModel = models().cubeAll(
+                "block/tree_marker",
+                new ResourceLocation(MothLib.MODID, "block/tree_marker")
+        );
+        logBlock((net.minecraft.world.level.block.RotatedPillarBlock) treeMarker);
+        simpleBlockItem(treeMarker, treeModel);
     }
 }

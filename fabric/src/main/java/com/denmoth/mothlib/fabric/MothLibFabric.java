@@ -15,9 +15,11 @@ public class MothLibFabric implements ModInitializer {
         MothFabricConfigBootstrap.register();
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.OP_BLOCKS).register(entries -> {
-            entries.accept(MothBlocks.GROUND_MARKER.get());
-            for (DyeColor color : DyeColor.values()) {
-                entries.accept(MothBlocks.COLORED_MARKERS.get(color).get());
+            if (entries.shouldShowOpRestrictedItems()) {
+                entries.accept(MothBlocks.GROUND_MARKER.get());
+                for (DyeColor color : DyeColor.values()) {
+                    entries.accept(MothBlocks.COLORED_MARKERS.get(color).get());
+                }
             }
         });
     }

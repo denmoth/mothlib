@@ -2,7 +2,6 @@ package com.denmoth.mothlib.network;
 
 import com.denmoth.mothlib.platform.MothServices;
 import com.denmoth.mothlib.platform.services.INetworkHelper;
-import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,25 +15,37 @@ import java.util.function.Function;
 public class MothNetwork {
 
     private final String modId;
+    private final String version;
+    private final String channelPath;
 
     public MothNetwork(String modId, String version) {
-        this(modId);
+        this(modId, version, "main");
     }
 
     public MothNetwork(String modId, String version, String channelPath) {
-        this(modId);
+        this.modId = modId;
+        this.version = version;
+        this.channelPath = channelPath;
     }
 
     public MothNetwork(String modId) {
-        this.modId = modId;
+        this(modId, "1");
     }
 
     public ResourceLocation id(String packetName) {
         return new ResourceLocation(modId, packetName);
     }
 
-    public <MSG extends IMothPacket> void register(INetworkHelper.Side side, String packetName, Function<FriendlyByteBuf, MSG> decoder) {
-        MothServices.NETWORK.registerReceiver(side, id(packetName), decoder);
+    public String getVersion() {
+        return version;
+    }
+
+    public String getChannelPath() {
+        return channelPath;
+    }
+
+    public <MSG extends IMothPacket> void register(INetworkHelper.Side side, Class<MSG> msgClass, String packetName, Function<FriendlyByteBuf, MSG> decoder) {
+        MothServices.NETWORK.registerReceiver(side, id(packetName), msgClass, decoder, version);
     }
 
     public void sendToServer(String packetName, IMothPacket msg) {

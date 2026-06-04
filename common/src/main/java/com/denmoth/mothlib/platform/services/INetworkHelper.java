@@ -12,7 +12,7 @@ public interface INetworkHelper {
         C2S, S2C
     }
 
-    <MSG extends IMothPacket> void registerReceiver(Side side, ResourceLocation id, Function<FriendlyByteBuf, MSG> decoder);
+    <MSG extends IMothPacket> void registerReceiver(Side side, ResourceLocation id, Class<MSG> msgClass, Function<FriendlyByteBuf, MSG> decoder, String version);
     
     void sendToServer(ResourceLocation id, IMothPacket packet);
     

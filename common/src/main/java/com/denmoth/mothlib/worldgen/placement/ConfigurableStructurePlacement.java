@@ -10,6 +10,7 @@ import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType;
 
+import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
 import java.util.Optional;
 
 public class ConfigurableStructurePlacement extends RandomSpreadStructurePlacement {
@@ -25,8 +26,8 @@ public class ConfigurableStructurePlacement extends RandomSpreadStructurePlaceme
             Codec.STRING.optionalFieldOf("config_id", "").forGetter(ConfigurableStructurePlacement::getConfigId)
     ).apply(instance, ConfigurableStructurePlacement::new));
 
+    private static final ThreadLocal<Long> CURRENT_SEED = new ThreadLocal<>();
     private final String configId;
-    private MothConfigRegistry.ConfigEntry cachedEntry;
 
     public ConfigurableStructurePlacement(Vec3i offset, FrequencyReductionMethod freqMethod, float freq, int salt, Optional<ExclusionZone> zone, int spacing, int separation, RandomSpreadType type, String configId) {
         super(offset, freqMethod, freq, salt, zone, spacing, separation, type);
@@ -38,10 +39,10 @@ public class ConfigurableStructurePlacement extends RandomSpreadStructurePlaceme
     }
 
     private MothConfigRegistry.ConfigEntry getEntry() {
-        if (cachedEntry == null && !configId.isEmpty()) {
-            cachedEntry = MothConfigRegistry.get(configId);
+        if (!configId.isEmpty()) {
+            return MothConfigRegistry.get(configId);
         }
-        return cachedEntry;
+        return null;
     }
 
     @Override
@@ -71,5 +72,49 @@ public class ConfigurableStructurePlacement extends RandomSpreadStructurePlaceme
     }
 
     public String getConfigId() { return configId; }
+    @Override
+    public boolean isStructureChunk(ChunkGeneratorStructureState state, int x, int z) {
+        long seed = 0L;
+        try {
+            for (java.lang.reflect.Field field : state.getClass().getDeclaredFields()) {
+                if (field.getType() == long.class) {
+                    field.setAccessible(true);
+                    seed = field.getLong(state);
+                    break;
+                }
+            }
+            if (seed == 0L) {
+                for (java.lang.reflect.Method method : state.getClass().getDeclaredMethods()) {
+                    if (method.getReturnType() == long.class && method.getParameterCount() == 0) {
+                        method.setAccessible(true);
+                        seed = (long) method.invoke(state);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // fallback
+        }
+        CURRENT_SEED.set(seed);
+        try {
+            return super.isStructureChunk(state, x, z);
+        } finally {
+            CURRENT_SEED.remove();
+        }
+    }
+
+    @Override
+    public int salt() {
+        Long seed = CURRENT_SEED.get();
+        if (seed != null && seed != 0L) {
+            double hash = Math.sin((double)(configId.hashCode() ^ seed)) * 43758.5453123;
+            return Math.abs((int) ((hash - Math.floor(hash)) * 1000000000));
+        }
+        if (!configId.isEmpty()) {
+            double hash = Math.sin((double)configId.hashCode()) * 43758.5453123;
+            return Math.abs((int) ((hash - Math.floor(hash)) * 1000000000));
+        }
+        return super.salt();
+    }
     @Override public StructurePlacementType<?> type() { return MothPlacements.CONFIGURABLE.get(); }
 }

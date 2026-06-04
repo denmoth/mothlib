@@ -33,13 +33,14 @@ public class MothLibForge {
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey() == CreativeModeTabs.OP_BLOCKS) {
+        if (event.getTabKey() == CreativeModeTabs.OP_BLOCKS && event.hasPermissions()) {
             event.accept(MothBlocks.GROUND_MARKER.get());
             for (DyeColor color : DyeColor.values()) {
                 event.accept(MothBlocks.COLORED_MARKERS.get(color).get());
             }
         }
     }
+
 
     public static void onGatherData(GatherDataEvent event) {
         MothDataGen.gatherData(event);

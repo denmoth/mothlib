@@ -18,23 +18,22 @@ import java.util.function.Function;
 
 public class ForgeNetworkHelper implements INetworkHelper {
 
-    private static final String PROTOCOL_VERSION = "1";
     private static final Map<String, SimpleChannel> CHANNELS = new HashMap<>();
     private static int packetId = 0;
 
-    private SimpleChannel getOrCreateChannel(String modId) {
+    private SimpleChannel getOrCreateChannel(String modId, String version) {
         return CHANNELS.computeIfAbsent(modId, id -> NetworkRegistry.newSimpleChannel(
                 new ResourceLocation(id, "main"),
-                () -> PROTOCOL_VERSION,
-                PROTOCOL_VERSION::equals,
-                PROTOCOL_VERSION::equals
+                () -> version,
+                version::equals,
+                version::equals
         ));
     }
 
     @Override
-    public <MSG extends IMothPacket> void registerReceiver(Side side, ResourceLocation id, Function<FriendlyByteBuf, MSG> decoder) {
-        SimpleChannel channel = getOrCreateChannel(id.getNamespace());
-        channel.registerMessage(packetId++, (Class<MSG>) IMothPacket.class, IMothPacket::encode, decoder, (msg, ctxSupplier) -> {
+    public <MSG extends IMothPacket> void registerReceiver(Side side, ResourceLocation id, Class<MSG> msgClass, Function<FriendlyByteBuf, MSG> decoder, String version) {
+        SimpleChannel channel = getOrCreateChannel(id.getNamespace(), version);
+        channel.registerMessage(packetId++, msgClass, IMothPacket::encode, decoder, (msg, ctxSupplier) -> {
             NetworkEvent.Context ctx = ctxSupplier.get();
             ctx.enqueueWork(() -> {
                 msg.handle(new IMothPacketContext() {
@@ -55,13 +54,17 @@ public class ForgeNetworkHelper implements INetworkHelper {
 
     @Override
     public void sendToServer(ResourceLocation id, IMothPacket packet) {
-        SimpleChannel channel = getOrCreateChannel(id.getNamespace());
-        channel.sendToServer(packet);
+        SimpleChannel channel = CHANNELS.get(id.getNamespace());
+        if (channel != null) {
+            channel.sendToServer(packet);
+        }
     }
 
     @Override
     public void sendToPlayer(ServerPlayer player, ResourceLocation id, IMothPacket packet) {
-        SimpleChannel channel = getOrCreateChannel(id.getNamespace());
-        channel.send(PacketDistributor.PLAYER.with(() -> player), packet);
+        SimpleChannel channel = CHANNELS.get(id.getNamespace());
+        if (channel != null) {
+            channel.send(PacketDistributor.PLAYER.with(() -> player), packet);
+        }
     }
 }

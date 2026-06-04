@@ -5,12 +5,18 @@
       "required": false
     },
     "minecraft:desert",
+    "minecraft:beach",
+    "minecraft:snowy_beach",
     {
       "id": "biomesoplenty:wasteland",
       "required": false
     },
     {
       "id": "terralith:desert_oasis",
+      "required": false
+    },
+    {
+      "id": "nyctophobia:eroded_haunted_forest",
       "required": false
     }
   ]

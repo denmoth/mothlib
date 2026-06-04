@@ -28,5 +28,4 @@ public class MothJigsawHelper {
         return Pair.of(single(id, modId, processors), weight);
     }
 
-    // TODO: Add support for LegacySinglePoolElement if needed
 }
