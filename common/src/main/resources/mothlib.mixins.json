@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.denmoth.mothlib.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "SinglePoolElementMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -22,6 +22,7 @@ public final class MothBiomeTags {
     public static final TagKey<Biome> TREES_CHERRY = create("trees/cherry");
     public static final TagKey<Biome> TREES_MAPLE = create("trees/maple");
     public static final TagKey<Biome> TREES_REDWOOD = create("trees/redwood");
+    public static final TagKey<Biome> TREES_TALL = create("trees/tall");
 
     // --- Surface / soil character (approximate, for worldgen logic) ---
     public static final TagKey<Biome> SOIL_GRASS = create("soil/grass");

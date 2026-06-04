@@ -8,6 +8,18 @@
     {
       "id": "regions_unexplored:blackwood_taiga",
       "required": false
+    },
+    {
+      "id": "promenade:dark_amaranth_forest",
+      "required": false
+    },
+    {
+      "id": "promenade:tall_dark_amaranth_forest",
+      "required": false
+    },
+    {
+      "id": "nyctophobia:deep_dark_forest",
+      "required": false
     }
   ]
 }

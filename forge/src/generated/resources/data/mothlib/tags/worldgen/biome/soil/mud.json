@@ -1,0 +1,17 @@
+{
+  "values": [
+    "minecraft:mangrove_swamp",
+    {
+      "id": "biomesoplenty:bog",
+      "required": false
+    },
+    {
+      "id": "biomeswevegone:cypress_swamps",
+      "required": false
+    },
+    {
+      "id": "nyctophobia:haunted_lakes",
+      "required": false
+    }
+  ]
+}

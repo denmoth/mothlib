@@ -10,6 +10,9 @@ displayName="MothLib"
 authors="Denmoth"
 description='''Core library for Denmoth mods.'''
 
+[[mixins]]
+config="mothlib.mixins.json"
+
 [[dependencies.mothlib]]
 modId="forge"
 mandatory=true

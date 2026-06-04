@@ -1,0 +1,20 @@
+{
+  "values": [
+    "minecraft:snowy_plains",
+    "minecraft:ice_spikes",
+    "minecraft:snowy_taiga",
+    "minecraft:snowy_beach",
+    "minecraft:grove",
+    "minecraft:snowy_slopes",
+    "minecraft:jagged_peaks",
+    "minecraft:frozen_peaks",
+    {
+      "id": "#forge:is_cold",
+      "required": false
+    },
+    {
+      "id": "#c:climate_cold",
+      "required": false
+    }
+  ]
+}

@@ -17,7 +17,7 @@ import java.util.function.Function;
 public class FabricNetworkHelper implements INetworkHelper {
 
     @Override
-    public <MSG extends IMothPacket> void registerReceiver(Side side, ResourceLocation id, Function<FriendlyByteBuf, MSG> decoder) {
+    public <MSG extends IMothPacket> void registerReceiver(Side side, ResourceLocation id, Class<MSG> msgClass, Function<FriendlyByteBuf, MSG> decoder, String version) {
         if (side == Side.S2C) {
             // Client receiver
             if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {

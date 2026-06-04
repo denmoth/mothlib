@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
@@ -25,35 +26,18 @@ public class MothTerrainMatchProcessor extends StructureProcessor {
         
         // Check if the block is our ground marker
         if (state.is(MothBlocks.GROUND_MARKER.get())) {
-            // Get the block that would naturally generate at this position (or slightly below if it's air)
-            // Wait, the structure is replacing the terrain. We need to find the terrain block.
-            // In a StructureProcessor, we can read the level.
-            // Actually, if the structure is placed in the air, maybe we want the block below it?
-            // Usually we just want to match the surface block.
-            // Let's get the block state from the level at the current position.
-            // If the structure hasn't placed blocks yet, level.getBlockState(pos) might have the original terrain.
-            BlockState terrainState = level.getBlockState(pos);
+            // Find the highest block on the surface at the column.
+            int surfaceY = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, pos.getX(), pos.getZ()) - 1;
             
-            // If it's air or water, maybe we should look down to find the surface?
-            // Or maybe just use what's there if it's solid.
-            if (terrainState.isAir() || !terrainState.getFluidState().isEmpty()) {
-                BlockPos.MutableBlockPos mutablePos = pos.mutable();
-                while (mutablePos.getY() > level.getMinBuildHeight()) {
-                    mutablePos.move(0, -1, 0);
-                    BlockState belowState = level.getBlockState(mutablePos);
-                    if (!belowState.isAir() && belowState.getFluidState().isEmpty()) {
-                        terrainState = belowState;
-                        break;
-                    }
-                }
-            }
+            // If the structure is above the surface, we might be placing it in the air. 
+            // The heightmap returns the top block (e.g. grass). 
+            // We use the block slightly below if the calculated surface is valid.
+            BlockPos targetPos = new BlockPos(pos.getX(), Math.max(surfaceY, level.getMinBuildHeight()), pos.getZ());
+            BlockState terrainState = level.getBlockState(targetPos);
             
             return new StructureTemplate.StructureBlockInfo(pos, terrainState, blockInfoGlobal.nbt());
         }
         
-        // For colored markers, maybe just remove them or leave them?
-        // The user said "цветные маркеры это для процессоров", so they might be used by other processors.
-        // We can just return the block as is.
         return blockInfoGlobal;
     }
 

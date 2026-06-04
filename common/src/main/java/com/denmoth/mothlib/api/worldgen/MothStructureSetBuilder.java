@@ -53,6 +53,11 @@ public class MothStructureSetBuilder {
         return this;
     }
 
+    public MothStructureSetBuilder configurablePlacement(int spacing, int separation, RandomSpreadType spreadType, int salt, String configId) {
+        this.placement = new ConfigurableStructurePlacement(spacing, separation, spreadType, salt, configId);
+        return this;
+    }
+
     public void register(ResourceKey<StructureSet> key) {
         if (placement == null) throw new IllegalStateException("Placement not set!");
         context.register(key, new StructureSet(List.copyOf(entries), placement));

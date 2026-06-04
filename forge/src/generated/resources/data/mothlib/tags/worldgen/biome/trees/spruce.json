@@ -15,6 +15,10 @@
     {
       "id": "terralith:winter_taiga",
       "required": false
+    },
+    {
+      "id": "nyctophobia:haunted_forest",
+      "required": false
     }
   ]
 }

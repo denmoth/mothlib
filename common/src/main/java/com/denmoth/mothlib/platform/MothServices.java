@@ -12,8 +12,13 @@ public class MothServices {
     public static final ICommandHelper COMMANDS = load(ICommandHelper.class);
 
     public static <T> T load(Class<T> clazz) {
-        return ServiceLoader.load(clazz)
-                .findFirst()
-                .orElseThrow(() -> new NullPointerException("Failed to load service for " + clazz.getName()));
+        try {
+            return ServiceLoader.load(clazz)
+                    .findFirst()
+                    .orElseThrow(() -> new NullPointerException("Failed to load service for " + clazz.getName()));
+        } catch (Throwable e) {
+            throw new IllegalStateException("MothLib Failed to load service: " + clazz.getName() + 
+                "\nThis usually means the platform (Forge/Fabric) didn't generate META-INF/services files correctly. Check your build configurations!", e);
+        }
     }
 }

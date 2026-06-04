@@ -1,11 +1,11 @@
 package com.denmoth.mothlib.api;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class MothConfigRegistry {
-    private static final Map<String, ConfigEntry> REGISTRY = new HashMap<>();
+    private static final Map<String, ConfigEntry> REGISTRY = new ConcurrentHashMap<>();
 
     public record ConfigEntry(
             Supplier<Integer> spacing,
