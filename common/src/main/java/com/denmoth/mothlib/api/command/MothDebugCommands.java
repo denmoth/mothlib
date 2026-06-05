@@ -23,10 +23,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Reusable debug command tree for mods using MothLib.
@@ -41,8 +44,10 @@ import java.util.concurrent.TimeoutException;
  */
 public class MothDebugCommands {
 
-    /** Timeout in seconds for the structure locate scan. */
-    private static final long SCAN_TIMEOUT_SECONDS = 10;
+    /** Timeout in seconds for each individual structure locate. */
+    private static final long SCAN_TIMEOUT_SECONDS = 15;
+    /** Search radius in chunks. */
+    private static final int SEARCH_RADIUS = 100;
 
     /**
      * Registers the debug command subtree under {@code /rootCommand debug}.
@@ -97,59 +102,63 @@ public class MothDebugCommands {
         ServerLevel level = source.getLevel();
         BlockPos pos = BlockPos.containing(source.getPosition());
 
-        source.sendSuccess(() -> Component.literal(
-                "§8┌────────────────────────────────┐"), false);
-        source.sendSuccess(() -> Component.literal(
-                "§6 [SCAN] Structure Scan  §7[" + namespace.toUpperCase() + "]  r=50ch  t=" + SCAN_TIMEOUT_SECONDS + "s"), false);
-        source.sendSuccess(() -> Component.literal(
-                "§8└────────────────────────────────┘"), false);
-
         var registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
 
-        CompletableFuture.runAsync(() -> {
-            registry.entrySet().stream()
-                    .filter(e -> e.getKey().location().getNamespace().equals(namespace))
-                    .forEach(entry -> {
-                        ResourceKey<Structure> key = entry.getKey();
-                        Structure structure = entry.getValue();
-                        try {
-                            CompletableFuture<com.mojang.datafixers.util.Pair<BlockPos, Holder<Structure>>> future =
-                                    CompletableFuture.supplyAsync(() ->
-                                            level.getChunkSource().getGenerator()
-                                                    .findNearestMapStructure(level, HolderSet.direct(Holder.direct(structure)), pos, 50, false)
-                                    );
+        // Collect all structures for this namespace
+        List<Map.Entry<ResourceKey<Structure>, Structure>> entries = registry.entrySet().stream()
+                .filter(e -> e.getKey().location().getNamespace().equals(namespace))
+                .toList();
 
-                            var pair = future.get(SCAN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        int total = entries.size();
+        source.sendSuccess(() -> Component.literal("Scanning " + total + " structures..."), false);
 
-                            if (pair != null) {
-                                BlockPos p = pair.getFirst();
-                                int dist = (int) Math.sqrt(p.distSqr(pos));
-                                String distStr = dist >= 1000 ? (dist / 1000) + "k" : dist + "";
-                                String cmd = "/tp @s " + p.getX() + " ~ " + p.getZ();
-                                Component coords = Component.literal("§b[" + p.getX() + ", " + p.getZ() + "]")
-                                        .withStyle(Style.EMPTY
-                                                .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cmd))
-                                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                                        Component.literal("§eClick to suggest /tp command")))
-                                                .withUnderlined(true)
-                                                .withBold(false));
-                                source.sendSuccess(() -> Component.literal(
-                                        "§a ✓ §f" + key.location().getPath() + " §7(" + distStr + "m) → ").append(coords), false);
-                            } else {
-                                source.sendSuccess(() -> Component.literal(
-                                        "§7 · " + key.location().getPath() + " §8— not in range"), false);
-                            }
-                        } catch (TimeoutException e) {
-                            source.sendSuccess(() -> Component.literal(
-                                    "§e [T] " + key.location().getPath() + " §8— timeout (>" + SCAN_TIMEOUT_SECONDS + "s)"), false);
-                        } catch (Exception e) {
-                            source.sendSuccess(() -> Component.literal(
-                                    "§c ✗ " + key.location().getPath() + "§8: " + e.getMessage()), false);
-                        }
-                    });
+        // Launch ALL searches in parallel on a thread pool
+        ExecutorService pool = Executors.newFixedThreadPool(Math.min(total, 8));
 
-            source.sendSuccess(() -> Component.literal("§8─────── §6Scan complete §8───────"), false);
-        });
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+        for (var entry : entries) {
+            ResourceKey<Structure> key = entry.getKey();
+            Structure structure = entry.getValue();
+
+            CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
+                try {
+                    return level.getChunkSource().getGenerator()
+                            .findNearestMapStructure(level, HolderSet.direct(Holder.direct(structure)), pos, SEARCH_RADIUS, false);
+                } catch (Exception e) {
+                    return null;
+                }
+            }, pool).orTimeout(SCAN_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .handle((pair, ex) -> {
+                String name = key.location().getPath();
+                if (ex != null) {
+                    source.sendSuccess(() -> Component.literal("§e" + name + " §7- timeout"), false);
+                } else if (pair != null) {
+                    BlockPos p = pair.getFirst();
+                    int dist = (int) Math.sqrt(p.distSqr(pos));
+                    String distStr = dist >= 1000 ? (dist / 1000) + "km" : dist + "m";
+                    String cmd = "/execute in " + level.dimension().location() + " run tp @s " + p.getX() + " ~ " + p.getZ();
+                    Component line = Component.literal("§a" + name + " §f[" + p.getX() + ", " + p.getZ() + "] §7(" + distStr + ")")
+                            .withStyle(Style.EMPTY
+                                    .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, cmd))
+                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                            Component.literal(cmd))));
+                    source.sendSuccess(() -> line, false);
+                } else {
+                    source.sendSuccess(() -> Component.literal("§7" + name + " §8- not found"), false);
+                }
+                return null;
+            });
+
+            futures.add(future);
+        }
+
+        // Wait for all to complete on yet another thread so we don't block the server
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenRun(() -> {
+                    pool.shutdown();
+                    source.sendSuccess(() -> Component.literal("§fDone."), false);
+                });
 
         return 1;
     }
@@ -184,9 +193,8 @@ public class MothDebugCommands {
         int count = offset[0];
         int skip = skipped[0];
         source.sendSuccess(() -> Component.literal(
-                "§8───── §6Loot Test §8─────\n" +
-                "§a ✓ §fPlaced §b" + count + "§f chests" +
-                (skip > 0 ? "  §7(" + skip + " skipped — not air)" : "")
+                "Placed " + count + " chests" +
+                (skip > 0 ? " (" + skip + " skipped)" : "")
         ), false);
         return 1;
     }
@@ -196,7 +204,7 @@ public class MothDebugCommands {
         Registry<Structure> registry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
 
         if (!registry.containsKey(id)) {
-            source.sendFailure(Component.literal("§cStructure not found: §f" + id));
+            source.sendFailure(Component.literal("Structure not found: " + id));
             return 0;
         }
 
@@ -204,12 +212,11 @@ public class MothDebugCommands {
         HolderSet<Biome> biomes = structure.biomes();
         long count = biomes.stream().count();
 
-        source.sendSuccess(() -> Component.literal(
-                "§8─── §6Biomes for §b" + id + " §7(" + count + ") §8───"), false);
+        source.sendSuccess(() -> Component.literal("Biomes for " + id + " (" + count + "):"), false);
         biomes.stream().forEach(holder -> {
             ResourceKey<Biome> key = holder.unwrapKey().orElse(null);
             if (key != null) {
-                source.sendSuccess(() -> Component.literal(" §8· §a" + key.location()), false);
+                source.sendSuccess(() -> Component.literal(" - " + key.location()), false);
             }
         });
         return 1;
@@ -221,7 +228,7 @@ public class MothDebugCommands {
         Registry<Structure> structureRegistry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
 
         if (!biomeRegistry.containsKey(biomeId)) {
-            source.sendFailure(Component.literal("§cBiome not found: §f" + biomeId));
+            source.sendFailure(Component.literal("Biome not found: " + biomeId));
             return 0;
         }
 
@@ -232,13 +239,12 @@ public class MothDebugCommands {
                 .filter(e -> e.getValue().biomes().contains(biomeHolder))
                 .toList();
 
-        source.sendSuccess(() -> Component.literal(
-                "§8─── §6Structures in §b" + biomeId + " §7(" + matching.size() + ") §8───"), false);
+        source.sendSuccess(() -> Component.literal("Structures in " + biomeId + " (" + matching.size() + "):"), false);
         if (matching.isEmpty()) {
-            source.sendSuccess(() -> Component.literal("§7 none"), false);
+            source.sendSuccess(() -> Component.literal(" none"), false);
         } else {
             matching.forEach(entry ->
-                    source.sendSuccess(() -> Component.literal(" §8· §a" + entry.getKey().location()), false));
+                    source.sendSuccess(() -> Component.literal(" - " + entry.getKey().location()), false));
         }
         return 1;
     }
